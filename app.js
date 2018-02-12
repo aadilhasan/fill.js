@@ -3,7 +3,11 @@ let el = document.getElementById("ctnr");
 let data = {
   fName: fill.updatable("Dwayne"),
   lName: "Johnnson",
-  testNo: fill.updatable(0)
+  testNo: fill.updatable(0),
+  fruits: {
+    best: "mango",
+    good: "banana"
+  }
 };
 fill.init(el, data);
 

@@ -50,7 +50,7 @@ const setChildren = function(node, el, data) {
 
       if (dependencies) {
         dependencies.forEach(dep => {
-          let val = data[dep.dependsOn];
+          let val = getValueFromObject(data, dep.dependsOn);
           if (typeof val === "object" && val instanceof updatableData) {
             val.setRefs(node, el);
             let temp = val;
@@ -69,4 +69,18 @@ const setChildren = function(node, el, data) {
       node.appendChild(getChildTree(child, data));
     }
   });
+};
+
+const getValueFromObject = function(obj, key) {
+  try {
+    let keyArray = key.split(".");
+    let val = obj;
+    keyArray.forEach(key => {
+      val = val[key];
+    });
+    return val;
+  } catch (e) {
+    console.warn("can not find value for ", key);
+    return null;
+  }
 };

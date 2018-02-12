@@ -1,17 +1,19 @@
-function makeTree(obj) {
-  console.log(" makking tree.. ", obj);
-  let tree = getChildTree(obj);
-  console.log(" final tree is ", tree);
+function makeTree(obj, data, root) {
+  let tree = getChildTree(obj, data);
+  let el = root.parentNode;
+  // console.log(" made tree ", el, root, tree);
+  el.replaceChild(tree, root);
+  obj._dom_node = tree;
 
-  let el = document.getElementById("test");
-  el.appendChild(tree);
+  console.log(" tree is ", obj, el);
 }
 
-const getChildTree = function childTree(el) {
+const getChildTree = function childTree(el, data) {
+  console.log(" getting child tree ", data, this);
   let node = document.createElement(el.value);
   setAttributes(node, el.attributes);
-  setChildren(node, el.children);
-
+  setChildren(node, el, data);
+  el._dom_node = node;
   return node;
 };
 
@@ -36,25 +38,35 @@ const setAttributes = function setAtrributes(node, attributes) {
 //   });
 // };
 
-const setChildren = function(node, children) {
+const setChildren = function(node, el, data) {
+  let children = el.children;
   if (children.length <= 0) return;
 
   children.forEach(child => {
     if (child.type == "text") {
       let { value, dependencies } = child;
 
-      console.log(" txt dependencies ", value, dependencies);
+      console.log(" txt dependencies ", value, dependencies, data);
 
       if (dependencies) {
         dependencies.forEach(dep => {
-          value = value.replace(dep.subStr, data[dep.dependsOn] || "");
+          let val = data[dep.dependsOn];
+          if (typeof val === "object" && val instanceof updatableData) {
+            val.setRefs(node, el);
+            let temp = val;
+            val = val.get();
+          }
+
+          value = value.replace(dep.subStr, val || "");
         });
       }
 
       let textNode = document.createTextNode(value);
+      console.log(" txt node is ", textNode);
+
       node.appendChild(textNode);
     } else {
-      node.appendChild(getChildTree(child));
+      node.appendChild(getChildTree(child, data));
     }
   });
 };

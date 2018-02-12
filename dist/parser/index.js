@@ -11,10 +11,21 @@ const parse = function parse(str, col) {
     return;
   }
 
+  if (str[index] == "<" && str[index + 1] == "!") {
+    skipComments(str, col);
+    removeWhiteSpace(str, col);
+    getTextFromContent(str, col);
+  }
+
   if (str[index] === "<") {
     col.index += 1;
-    getTagName(str, col);
-    getContent(str, col);
+    let isSelfClosing = getTagName(str, col);
+    console.log(" is self closing ", isSelfClosing);
+
+    // do not check for content if the tag is self closing
+    if (!isSelfClosing) {
+      getContent(str, col);
+    }
 
     if (col.index < str.length) {
       parse(str, col);
@@ -24,14 +35,47 @@ const parse = function parse(str, col) {
   return col;
 };
 
+const selfClosingTags = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "command",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr"
+];
+
 const getContent = function content(str, col) {
   console.log(" =========  content ============== ", col);
+
+  if (col.index >= str.length) return;
+
+  getTextFromContent(str, col);
 
   let index = col.index;
   let content = "";
 
-  if (index >= str.length) return;
+  console.log(" content ", col);
 
+  if (str[index] == "<") {
+    console.log(" calling parse");
+    parse(str, col);
+    console.log(" returned from parse ", col);
+  }
+};
+
+const getTextFromContent = function(str, col) {
+  let index = col.index;
+  let content = "";
   while (str[index] !== "<") {
     content += str[index];
     index += 1;
@@ -44,14 +88,6 @@ const getContent = function content(str, col) {
     type: "text",
     value: content
   });
-
-  console.log(" content ", col);
-
-  if (str[index] == "<") {
-    console.log(" calling parse");
-    parse(str, col);
-    console.log(" returned from parse ", col);
-  }
 };
 
 const getTagName = function tagName(str, col) {
@@ -69,9 +105,11 @@ const getTagName = function tagName(str, col) {
 
   col.index = index;
 
+  let tagType = selfClosingTags.indexOf(tag) !== -1 ? "self-closing" : "open";
+
   col.data.push({
     type: "tag",
-    tagType: "open",
+    tagType: tagType,
     value: tag
   });
 
@@ -79,6 +117,7 @@ const getTagName = function tagName(str, col) {
 
   getAttributes(str, col);
   console.log(" got attrs ", col, str.substr(col.index, col.index + 5));
+  return tagType == "self-closing";
 };
 
 const getClosingTagName = function(str, col) {
@@ -186,4 +225,18 @@ const removeWhiteSpace = function removeSpace(str, col) {
   }
 
   col.index = index;
+};
+
+const skipComments = function comment(str, col) {
+  let index = col.index;
+  console.log(" comment found ", col.index, str[index]);
+  while (str[index] !== "-" || str[index + 1] !== ">") {
+    index += 1;
+    console.log(
+      " skipping comment ",
+      str[index] !== "-" || str[index + 1] !== ">"
+    );
+  }
+  console.log(" comment ended here ", index, str[index], str[index + 1]);
+  col.index = index + 2;
 };

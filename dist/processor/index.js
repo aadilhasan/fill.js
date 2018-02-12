@@ -53,7 +53,10 @@ const getChildren = function getChildren(array, d) {
       processText(el);
       children.push(el);
       d.index += 1;
-    } else if (el.type == "tag" && el.tagType == "open") {
+    } else if (
+      el.type == "tag" &&
+      (el.tagType == "open" || array[d.index].tagType == "self-closing")
+    ) {
       let temp = array[d.index];
       let openTags = d.openTags;
 
@@ -61,17 +64,16 @@ const getChildren = function getChildren(array, d) {
 
       temp.attributes = getElAttribute(array, d);
 
-      //       console.log(' found open tag.. ', temp, openTags, array[d.index]);
-
-      if (array[d.index].tagType == "close") {
+      // if tag is closing or self-closing then don't look for children
+      if (
+        array[d.index].tagType == "close" ||
+        array[d.index].tagType == "self-closing"
+      ) {
         temp.children = [];
       } else {
         d.openTags.push(temp.value);
-
         temp.children = getChildren(array, d);
         let index = d.index;
-
-        //         console.log('got children.. ', temp, array[d.index], index);
       }
 
       children.push(temp);

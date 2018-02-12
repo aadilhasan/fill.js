@@ -4,31 +4,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>JS Bin</title>
+    <title> Fill JS</title>
 </head>
 
 <body>
     <div id="ctnr">
         <div id="center" class="box red-box">
-            <h1> Hello world </h1>
+            <!-- You will not be able to see this text. -->
+
+            Read more: https://html.com/tags/comment-tag/#ixzz56tFDDxec
+            <h1> Hello world {{fName}} </h1>
             <p id="pera"> Hello {{fName}} {{lName}}
                 <span class="colored"> xyz
                     <span> ABC </span>
                 </span>
             </p>
             <div>
-                test test {{bro}}
+                test test {{testNo}}
             </div>
+            <div>
+                <br>
+                <input type="text" placeholder=" test input " />
+            </div>
+        </div>
+        <div>
+            <button onclick="updateTest()"> Next test </button>
         </div>
     </div>
 
-    <div id="test">
-
-    </div>
 
     <script src="dist/parser/index.js"></script>
     <script src="dist/processor/index.js"></script>
     <script src="dist/tree/index.js"></script>
+    <script src="dist/api/index.js"></script>
     <script src="app.js"></script>
 
 

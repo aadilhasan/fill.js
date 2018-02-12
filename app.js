@@ -1,21 +1,25 @@
 let el = document.getElementById("ctnr");
 
-const col = {
-  data: [],
-  index: 0
+let data = {
+  fName: fill.updatable("Dwayne"),
+  lName: "Johnnson",
+  testNo: fill.updatable(0)
 };
+fill.init(el, data);
 
-const data = {
-  fName: "aadil",
-  lName: "hasan"
-};
+fill.watch("fName", function(newVal, old) {
+  console.log(" fName changed ", newVal, old);
+});
 
-console.log(" this is app.js ", el);
+function updateTest() {
+  fill.updateData("testNo", Math.random());
+}
 
-let parsed = parse(el.outerHTML, col);
+setTimeout(() => {
+  fill.updateData("fName", "The");
+  // fill.updateData("lName", "Rock");
+}, 2000);
 
-console.log(" parsed data ", parsed);
-
-let nestedEls = process(parsed);
-
-makeTree(nestedEls);
+setTimeout(() => {
+  fill.updateData("fName", "Rock");
+}, 5000);

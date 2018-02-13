@@ -1,5 +1,5 @@
 const parse = function parse(str, col) {
-  console.log(" =========  parse ========= ", col, str.length);
+  // console.log(" =========  parse ========= ", col, str.length);
   removeWhiteSpace(str, col);
   let index = col.index;
 
@@ -20,7 +20,7 @@ const parse = function parse(str, col) {
   if (str[index] === "<") {
     col.index += 1;
     let isSelfClosing = getTagName(str, col);
-    console.log(" is self closing ", isSelfClosing);
+    // console.log(" is self closing ", isSelfClosing);
 
     // do not check for content if the tag is self closing
     if (!isSelfClosing) {
@@ -55,7 +55,7 @@ const selfClosingTags = [
 ];
 
 const getContent = function content(str, col) {
-  console.log(" =========  content ============== ", col);
+  // console.log(" =========  content ============== ", col);
 
   if (col.index >= str.length) return;
 
@@ -64,12 +64,12 @@ const getContent = function content(str, col) {
   let index = col.index;
   let content = "";
 
-  console.log(" content ", col);
+  // console.log(" content ", col);
 
   if (str[index] == "<") {
-    console.log(" calling parse");
+    // console.log(" calling parse");
     parse(str, col);
-    console.log(" returned from parse ", col);
+    // console.log(" returned from parse ", col);
   }
 };
 
@@ -79,7 +79,7 @@ const getTextFromContent = function(str, col) {
   while (str[index] !== "<") {
     content += str[index];
     index += 1;
-    console.log(str[index]);
+    // console.log(str[index]);
   }
 
   col.index = index;
@@ -91,7 +91,7 @@ const getTextFromContent = function(str, col) {
 };
 
 const getTagName = function tagName(str, col) {
-  console.log(" =========  tag name ============== ", col);
+  // console.log(" =========  tag name ============== ", col);
 
   let index = col.index;
   let tag = "";
@@ -113,10 +113,10 @@ const getTagName = function tagName(str, col) {
     value: tag
   });
 
-  console.log(" col is ", col, index);
+  // console.log(" col is ", col, index);
 
   getAttributes(str, col);
-  console.log(" got attrs ", col, str.substr(col.index, col.index + 5));
+  // console.log(" got attrs ", col, str.substr(col.index, col.index + 5));
   return tagType == "self-closing";
 };
 
@@ -154,7 +154,7 @@ const getAttributes = function attributes(str, col) {
     len = str.length;
 
   if (index >= str.length) return;
-  console.log(" item ", str[index], index);
+  // console.log(" item ", str[index], index);
 
   while (index < len && str[index] !== '"' && str[index] !== "'") {
     attrValue += str[index];
@@ -175,7 +175,7 @@ const getAttributes = function attributes(str, col) {
     }
   });
 
-  console.log(" final... ", index, col);
+  // console.log(" final... ", index, col);
 
   if (index >= str.length) return;
 
@@ -199,7 +199,7 @@ const getAttrName = function(str, col) {
     len = str.length;
   let attrName = "";
 
-  console.log(" checking in attrName ", index, str.substr(index, index + 5));
+  // console.log(" checking in attrName ", index, str.substr(index, index + 5));
   if (index >= str.length) return;
   while (index < len && str[index] !== "=") {
     attrName += str[index];
@@ -210,7 +210,7 @@ const getAttrName = function(str, col) {
 
   col.index = index;
 
-  console.log(" attrName index in last ", index);
+  // console.log(" attrName index in last ", index);
 
   return attrName;
 };
@@ -229,14 +229,10 @@ const removeWhiteSpace = function removeSpace(str, col) {
 
 const skipComments = function comment(str, col) {
   let index = col.index;
-  console.log(" comment found ", col.index, str[index]);
+  // console.log(" comment found ", col.index, str[index]);
   while (str[index] !== "-" || str[index + 1] !== ">") {
     index += 1;
-    console.log(
-      " skipping comment ",
-      str[index] !== "-" || str[index + 1] !== ">"
-    );
   }
-  console.log(" comment ended here ", index, str[index], str[index + 1]);
+  // console.log(" comment ended here ", index, str[index], str[index + 1]);
   col.index = index + 2;
 };

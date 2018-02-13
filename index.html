@@ -13,17 +13,23 @@
             <!-- You will not be able to see this text. -->
 
             Read more: https://html.com/tags/comment-tag/#ixzz56tFDDxec
-            <h1> Hello world {{fName}} </h1>
-            <p id="pera"> Hello {{fName}} {{lName}}
-                <span class="colored"> xyz
-                    <span> ABC, {{fruits.best}} </span>
+            <h1> Hello world </h1>
+            <p id="pera"> Hello
+                <span class="colored"> xyz {{fName.get()}}
+                    <span> ABC, {{55+testNo.get()}} </span>
                 </span>
             </p>
             <div>
-                test test {{testNo}}
+                <div>
+                    test test {{fName.get() + ' ' + lName.get()}}
+                </div>
+                <br/>
+                <div>
+                    {{lName}}
+                </div>
             </div>
             <div>
-                <br>
+                <br/>
                 <input type="text" placeholder=" test input " />
             </div>
         </div>

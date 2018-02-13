@@ -1,11 +1,12 @@
 const fc = function() {
   this.el = null;
   this.data = {};
-};
-
-const col = {
-  data: [],
-  index: 0
+  this.nodes = {};
+  this.nodeCount = 0;
+  this.col = {
+    data: [],
+    index: 0
+  };
 };
 
 const updatableData = function(val) {
@@ -19,10 +20,11 @@ updatableData.prototype.setVal = function(newVal) {
   return newVal;
 };
 
-updatableData.prototype.setRefs = function(ref, dep) {
+updatableData.prototype.setRefs = function(ref, dep, nodeNo) {
   this.refs.push({
     ref: ref,
-    dep: dep || null
+    dep: dep || null,
+    nodeNo
   });
 };
 
@@ -41,18 +43,32 @@ fc.prototype.updatable = val => {
   return new updatableData(val);
 };
 
-fc.prototype.updateData = function(key, val) {
+let i = 0;
+
+fc.prototype.updateData = function(key, val, forced = false) {
   let item = this.data[key];
+  if (!forced && item.get() == val) {
+    return;
+  }
   let oldVal = item.val;
   item.setVal(val);
   tempRefs = item.refs;
   item.clearRefs();
-  console.log(" refs ", item.refs);
+  // console.log(" refs ", tempRefs, item.refs, this.data[key]);
+  // if (i == 1) return;
+  // i++;
   tempRefs.forEach((ref, index) => {
-    let newEl = getChildTree(ref.dep, this.data);
+    let nodeCount = this.nodeCount;
+    // console.log(" updatig ", ref, nodeCount);
+    ref.ref = this.nodes[ref.nodeNo];
+    this.nodeCount = parseInt(ref.nodeNo.slice(1));
+    // console.log(" new this ", this);
+    let newEl = getChildTree(ref.dep, this);
     let parent = ref.ref.parentNode;
     parent.replaceChild(newEl, ref.ref);
+    this.nodes[ref.nodeNo] = newEl;
   });
+  // console.log(" updated ", this.data[key]);
 
   if (item.watcher !== null) {
     item.watcher(item.val, oldVal);
@@ -64,16 +80,24 @@ fc.prototype.watch = function(key, cb) {
   item.watcher = cb;
 };
 
-console.log(" parse is  ", fc.prototype.parse);
+// console.log(" parse is  ", fc.prototype.parse);
 
 fc.prototype.init = function(el, data) {
-  console.log(" innt params ", el, data);
+  // console.log(" innt params ", el, data);
   this.el = el;
   this.data = data;
-  let parsedArray = this.parse(this.el.outerHTML, col);
+  let parsedArray = this.parse(this.el.outerHTML, this.col);
 
-  let processed = this.processArray(parsedArray);
-  this.makeTree(processed, this.data, this.el);
+  let {
+    processedData,
+    evalFunction,
+    evalInitializedVariables
+  } = this.processArray(parsedArray);
+  this.evalFunction = new Function("data", "exp", evalFunction);
+  this.evalFunctionString = evalFunction;
+  this.evalInitializedVariables = evalInitializedVariables;
+  // console.log(" before making tree ", processedData);
+  this.makeTree(processedData, this);
 };
 
-const fill = new fc();
+window.fill = new fc();

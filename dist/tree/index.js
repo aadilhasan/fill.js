@@ -1,18 +1,25 @@
-function makeTree(obj, data, root) {
-  let tree = getChildTree(obj, data);
-  let el = root.parentNode;
-  // console.log(" made tree ", el, root, tree);
-  el.replaceChild(tree, root);
+function makeTree(obj, that) {
+  // console.log(" making tree ", that);
+  let { evalFunction, el } = that;
+  let tree = getChildTree(obj, that);
+  let el2 = el.parentNode;
+  // console.log(" dom tree is ", el2, el, tree);
+  el2.replaceChild(tree, el);
   obj._dom_node = tree;
 
-  console.log(" tree is ", obj, el);
+  // console.log(" tree is ", obj, el);
 }
 
-const getChildTree = function childTree(el, data) {
-  console.log(" getting child tree ", data, this);
+const getChildTree = function(el, that) {
+  let { nodes, nodeCount, evalFunction } = that;
   let node = document.createElement(el.value);
+  // console.log(" getting child tree ", el, node);
+  node.setAttribute("f-id", "#" + nodeCount);
+  that["nodes"]["#" + nodeCount] = node;
+  let count = nodeCount;
+  that["nodeCount"] += 1;
   setAttributes(node, el.attributes);
-  setChildren(node, el, data);
+  setChildren(node, el, that, count);
   el._dom_node = node;
   return node;
 };
@@ -25,20 +32,11 @@ const setAttributes = function setAtrributes(node, attributes) {
   });
 };
 
-// const setChildren = function(node, children) {
-//   if (children.length <= 0) return;
+const setChildren = function(node, el, that, count) {
+  let { data, evalFunction } = that;
 
-//   children.forEach(child => {
-//     if (child.type == "text") {
-//       let textNode = document.createTextNode(child.value);
-//       node.appendChild(textNode);
-//     } else {
-//       node.appendChild(getChildTree(child));
-//     }
-//   });
-// };
+  // console.log(" set children ", data);
 
-const setChildren = function(node, el, data) {
   let children = el.children;
   if (children.length <= 0) return;
 
@@ -46,15 +44,35 @@ const setChildren = function(node, el, data) {
     if (child.type == "text") {
       let { value, dependencies } = child;
 
-      console.log(" txt dependencies ", value, dependencies, data);
+      // console.log(
+      //   " txt dependencies ============== ",
+      //   value,
+      //   dependencies,
+      //   data,
+      //   evalFunction
+      // );
 
       if (dependencies) {
         dependencies.forEach(dep => {
-          let val = getValueFromObject(data, dep.dependsOn);
+          let val = getValueFromObject(data, evalFunction, dep);
+          // console.log(" gettting valure for ", dep, val);
+          // if expession has only one vriable, and it is updatable then return updated val
           if (typeof val === "object" && val instanceof updatableData) {
-            val.setRefs(node, el);
+            // console.log(" cheking node attibutes ", count);
+            val.setRefs(node, el, "#" + count);
             let temp = val;
             val = val.get();
+          } else if (dep.keys.length > 0) {
+            // if expression has multiple variable and there are updatable variables then add refs to that variable
+            dep.keys.forEach(key => {
+              let updatable = data[key];
+              if (
+                typeof updatable === "object" &&
+                updatable instanceof updatableData
+              ) {
+                updatable.setRefs(node, el, "#" + count);
+              }
+            });
           }
 
           value = value.replace(dep.subStr, val || "");
@@ -62,25 +80,20 @@ const setChildren = function(node, el, data) {
       }
 
       let textNode = document.createTextNode(value);
-      console.log(" txt node is ", textNode);
+      // console.log(" txt node is ", textNode);
 
       node.appendChild(textNode);
     } else {
-      node.appendChild(getChildTree(child, data));
+      node.appendChild(getChildTree(child, that));
     }
   });
 };
 
-const getValueFromObject = function(obj, key) {
+const getValueFromObject = function(obj, evalFunction, key) {
   try {
-    let keyArray = key.split(".");
-    let val = obj;
-    keyArray.forEach(key => {
-      val = val[key];
-    });
-    return val;
+    return evalFunction(obj, key.dependsOn);
   } catch (e) {
-    console.warn("can not find value for ", key);
-    return null;
+    console.warn("can not find value for ", key, e);
+    return "";
   }
 };

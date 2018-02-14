@@ -1,3 +1,7 @@
+const parse = require("../parser");
+const process = require("../processor");
+const { makeTree, getChildTree } = require("../tree");
+
 const fc = function() {
   this.el = null;
   this.data = {};
@@ -52,7 +56,7 @@ fc.prototype.updateData = function(key, val, forced = false) {
   }
   let oldVal = item.val;
   item.setVal(val);
-  tempRefs = item.refs;
+  let tempRefs = item.refs;
   item.clearRefs();
   // console.log(" refs ", tempRefs, item.refs, this.data[key]);
   // if (i == 1) return;
@@ -96,6 +100,7 @@ fc.prototype.init = function(el, data) {
   this.evalFunction = new Function("data", "exp", evalFunction);
   this.evalFunctionString = evalFunction;
   this.evalInitializedVariables = evalInitializedVariables;
+  this.updatable = updatableData;
   // console.log(" before making tree ", processedData);
   this.makeTree(processedData, this);
 };

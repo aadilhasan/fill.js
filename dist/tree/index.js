@@ -57,7 +57,7 @@ const setChildren = function(node, el, that, count) {
           let val = getValueFromObject(data, evalFunction, dep);
           // console.log(" gettting valure for ", dep, val);
           // if expession has only one vriable, and it is updatable then return updated val
-          if (typeof val === "object" && val instanceof updatableData) {
+          if (typeof val === "object" && val instanceof that.updatable) {
             // console.log(" cheking node attibutes ", count);
             val.setRefs(node, el, "#" + count);
             let temp = val;
@@ -68,7 +68,7 @@ const setChildren = function(node, el, that, count) {
               let updatable = data[key];
               if (
                 typeof updatable === "object" &&
-                updatable instanceof updatableData
+                updatable instanceof that.updatable
               ) {
                 updatable.setRefs(node, el, "#" + count);
               }
@@ -96,4 +96,9 @@ const getValueFromObject = function(obj, evalFunction, key) {
     console.warn("can not find value for ", key, e);
     return "";
   }
+};
+
+module.exports = {
+  makeTree: makeTree,
+  getChildTree: getChildTree
 };

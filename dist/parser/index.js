@@ -62,7 +62,6 @@ const getContent = function content(str, col) {
   getTextFromContent(str, col);
 
   let index = col.index;
-  let content = "";
 
   // console.log(" content ", col);
 
@@ -236,3 +235,5 @@ const skipComments = function comment(str, col) {
   // console.log(" comment ended here ", index, str[index], str[index + 1]);
   col.index = index + 2;
 };
+
+module.exports = parse;

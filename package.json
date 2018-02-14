@@ -1,0 +1,30 @@
+{
+  "name": "fill.js",
+  "version": "1.0.0",
+  "description": "small lightweight templating engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify ./dist/api -t babelify --outfile ./src/fill.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aadilhasan/fill.js.git"
+  },
+  "keywords": [
+    "js",
+    "templating",
+    "engine"
+  ],
+  "author": "aadil hasan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aadilhasan/fill.js/issues"
+  },
+  "homepage": "https://github.com/aadilhasan/fill.js#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0"
+  }
+}

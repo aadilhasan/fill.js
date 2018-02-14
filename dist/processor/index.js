@@ -160,3 +160,5 @@ const getElAttribute = function getElAttr(array, d) {
   d.index = index;
   return attributes;
 };
+
+module.exports = process;
